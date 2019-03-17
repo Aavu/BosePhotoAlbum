@@ -44,6 +44,10 @@ class SlideShowViewController: UIViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.isNavigationBarHidden = true
+    }
+    
     @objc func changeSlide() {
         if (Int(currentSlide) < slideShowImages.count-1) {
             currentSlide += 1
