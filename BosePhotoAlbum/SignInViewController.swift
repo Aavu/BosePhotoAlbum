@@ -33,11 +33,16 @@ class SignInViewController: UIViewController {
     }
     
     @IBAction func signIn(_ sender: Any) {
-        guard let email = emailTextField.text, let password = passwordTextField.text
-            else {
-                print("not valid")
-                return
-        }
+//        guard let email = emailTextField.text, let password = passwordTextField.text
+//            else {
+//                print("not valid")
+//                return
+//        }
+        
+        let email = "test@gmail.com"
+        let password = "aaaaaa"
+//        let email = "violinsimma@gmail.com"
+//        let password = "Sankar63"
         Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
             if let error = error {
                 print(error)
@@ -45,7 +50,6 @@ class SignInViewController: UIViewController {
             }
             
             let layout = UICollectionViewFlowLayout()
-            
             let homeVC = HomeViewController(collectionViewLayout: layout)
             self.navigationController?.pushViewController(homeVC, animated: true)
         }

@@ -24,10 +24,28 @@ class AlbumsCell: UICollectionViewCell {
         return lbl
     }()
     
+    let deleteBtn: UIButton = {
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setImage(#imageLiteral(resourceName: "checkMark"), for: UIControl.State.selected)
+        btn.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        btn.widthAnchor.constraint(equalTo: btn.heightAnchor).isActive = true
+        return btn
+    }()
+    
+    var isEditing: Bool = false {
+        didSet {
+            deleteBtn.isHidden = !isEditing
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubview(iconView)
         self.addSubview(albumLabel)
+        self.addSubview(deleteBtn)
+        deleteBtn.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+        deleteBtn.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         iconView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         iconView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
         iconView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true

@@ -17,6 +17,11 @@
 		7AD1B443223E5B7E00A656AA /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD1B442223E5B7E00A656AA /* SignUpViewController.swift */; };
 		7AD1B445223E5BB200A656AA /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD1B444223E5BB200A656AA /* SignInViewController.swift */; };
 		7AD1B447223E7F4400A656AA /* AlbumsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD1B446223E7F4400A656AA /* AlbumsCell.swift */; };
+		7AD1B449223EE56500A656AA /* PhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD1B448223EE56500A656AA /* PhotosViewController.swift */; };
+		7AD1B44B223F362E00A656AA /* PhotosCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD1B44A223F362E00A656AA /* PhotosCell.swift */; };
+		7AD1B44F223F4E4300A656AA /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD1B44E223F4E4300A656AA /* Album.swift */; };
+		7AD1B451223F4F9800A656AA /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD1B450223F4F9800A656AA /* User.swift */; };
+		7AD1B453223FC95800A656AA /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD1B452223FC95800A656AA /* ImageViewController.swift */; };
 		885CDA7FAE13D41FEDD40E9B /* Pods_BosePhotoAlbum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84FC685C2A6C580941DF2141 /* Pods_BosePhotoAlbum.framework */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +40,11 @@
 		7AD1B442223E5B7E00A656AA /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		7AD1B444223E5BB200A656AA /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
 		7AD1B446223E7F4400A656AA /* AlbumsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsCell.swift; sourceTree = "<group>"; };
+		7AD1B448223EE56500A656AA /* PhotosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosViewController.swift; sourceTree = "<group>"; };
+		7AD1B44A223F362E00A656AA /* PhotosCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosCell.swift; sourceTree = "<group>"; };
+		7AD1B44E223F4E4300A656AA /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
+		7AD1B450223F4F9800A656AA /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		7AD1B452223FC95800A656AA /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
 		84FC685C2A6C580941DF2141 /* Pods_BosePhotoAlbum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BosePhotoAlbum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -88,17 +98,22 @@
 		7A60FC95223E1A0C0095CD1D /* BosePhotoAlbum */ = {
 			isa = PBXGroup;
 			children = (
-				7A60FC96223E1A0C0095CD1D /* AppDelegate.swift */,
 				7A60FC98223E1A0C0095CD1D /* HomeViewController.swift */,
+				7A60FCAA223E2B530095CD1D /* SlideShowViewController.swift */,
+				7AD1B442223E5B7E00A656AA /* SignUpViewController.swift */,
+				7AD1B444223E5BB200A656AA /* SignInViewController.swift */,
+				7AD1B448223EE56500A656AA /* PhotosViewController.swift */,
+				7AD1B446223E7F4400A656AA /* AlbumsCell.swift */,
+				7AD1B44A223F362E00A656AA /* PhotosCell.swift */,
+				7A60FC96223E1A0C0095CD1D /* AppDelegate.swift */,
 				7A60FC9A223E1A0C0095CD1D /* Main.storyboard */,
 				7A60FC9F223E1A0D0095CD1D /* LaunchScreen.storyboard */,
 				7A60FCA2223E1A0D0095CD1D /* Info.plist */,
 				7A60FCA8223E22060095CD1D /* Assets.xcassets */,
-				7A60FCAA223E2B530095CD1D /* SlideShowViewController.swift */,
 				7AD1B440223E56BB00A656AA /* GoogleService-Info.plist */,
-				7AD1B442223E5B7E00A656AA /* SignUpViewController.swift */,
-				7AD1B444223E5BB200A656AA /* SignInViewController.swift */,
-				7AD1B446223E7F4400A656AA /* AlbumsCell.swift */,
+				7AD1B44E223F4E4300A656AA /* Album.swift */,
+				7AD1B450223F4F9800A656AA /* User.swift */,
+				7AD1B452223FC95800A656AA /* ImageViewController.swift */,
 			);
 			path = BosePhotoAlbum;
 			sourceTree = "<group>";
@@ -204,8 +219,15 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-BosePhotoAlbum/Pods-BosePhotoAlbum-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC/GRPCClient.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-ProtoRPC/ProtoRPC.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-RxLibrary/RxLibrary.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
@@ -213,8 +235,15 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRPCClient.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProtoRPC.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxLibrary.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
@@ -230,11 +259,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AD1B44B223F362E00A656AA /* PhotosCell.swift in Sources */,
 				7A60FC99223E1A0C0095CD1D /* HomeViewController.swift in Sources */,
 				7A60FC97223E1A0C0095CD1D /* AppDelegate.swift in Sources */,
 				7AD1B443223E5B7E00A656AA /* SignUpViewController.swift in Sources */,
 				7AD1B445223E5BB200A656AA /* SignInViewController.swift in Sources */,
+				7AD1B44F223F4E4300A656AA /* Album.swift in Sources */,
+				7AD1B449223EE56500A656AA /* PhotosViewController.swift in Sources */,
 				7A60FCAB223E2B530095CD1D /* SlideShowViewController.swift in Sources */,
+				7AD1B451223F4F9800A656AA /* User.swift in Sources */,
+				7AD1B453223FC95800A656AA /* ImageViewController.swift in Sources */,
 				7AD1B447223E7F4400A656AA /* AlbumsCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
