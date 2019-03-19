@@ -12,6 +12,7 @@ public extension Notification.Name {
     public static let playMusic = Notification.Name(rawValue: "playMusic")
     public static let nextSong = Notification.Name(rawValue: "nextSong")
     public static let prevSong = Notification.Name(rawValue: "prevSong")
+    public static let showHidePlayer = Notification.Name(rawValue: "showHidePlayer")
 }
 
 extension UICollectionViewController {

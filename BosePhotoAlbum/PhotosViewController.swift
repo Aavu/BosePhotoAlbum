@@ -27,6 +27,8 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     var imageURL:[String] = []
     
     var albumName:String!
+    var albumID:String!
+    var ownerID:String?
     
     let uid = Auth.auth().currentUser?.uid
     var user:User?
@@ -38,6 +40,8 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     let db = Firestore.firestore()
     
     var rightBarBtn:UIBarButtonItem!
+    
+    var longPressGesture:UILongPressGestureRecognizer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,11 +69,10 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
         
         fetchPhotosForAlbum()
         
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(selectCell(sender:)))
+        longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(selectCell(sender:)))
         longPressGesture.minimumPressDuration = 0.5
         longPressGesture.delaysTouchesBegan = true
         collectionView.addGestureRecognizer(longPressGesture)
-        
         view.addSubview(progressView)
         progressView.center = view.center
         progressView.hidesWhenStopped = true
@@ -104,7 +107,7 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
         }
         var rightBarButton:UIBarButtonItem?
         if enter {
-            rightBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelSelecting))
+            rightBarButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(handleSharing))
         } else {
             if let indexPaths = collectionView?.indexPathsForVisibleItems {
                 for indexPath in indexPaths {
@@ -114,18 +117,60 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
                 }
             }
             navigationItem.title = albumName
-            rightBarButton = nil
+            rightBarButton = rightBarBtn
             selectedPhotosIndexPath.removeAll()
         }
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
+    @objc func handleSharing() {
+        let url = NSURL(fileURLWithPath: "String")
+        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        activityVC.popoverPresentationController?.sourceView = self.view
+        showHidePlayer()
+        
+        activityVC.completionWithItemsHandler = { (activityType, completed:Bool, returnedItems:[Any]?, error: Error?) in
+            self.selectionMode(enter: false)
+            self.showHidePlayer()
+        }
+        self.present(activityVC, animated: true, completion: nil)
+    }
+    
+    func showHidePlayer() {
+        NotificationCenter.default.post(name: .showHidePlayer, object: nil)
+    }
+    
     @objc func handleTrash() {
-        print("removed from db")
+        let array = Array(selectedPhotosIndexPath.sorted().reversed())
+        print(array, imageURL.count)
+        for index in array {
+            if self.imageURL.indices.contains(index.row) {
+                self.imageURL.remove(at: index.row)
+            }
+            if self.photos.indices.contains(index.row) {
+                self.photos.remove(at: index.row)
+            }
+        }
+        db.collection("Albums").document(albumID).setData(["imageURL" : self.imageURL], merge: true) { (error) in
+            if let error = error {
+                print(error.localizedDescription)
+                return
+            }
+            print(self.albumID)
+            self.reloadData = true
+        }
         selectionMode(enter: false)
     }
     
-    var selectedPhotosIndexPath:[IndexPath] = []
+    var selectedPhotosIndexPath:[IndexPath] = [] {
+        didSet {
+            if (selectedPhotosIndexPath.count > 1 || selectedPhotosIndexPath.count == 0)  {
+                navigationItem.rightBarButtonItem?.isEnabled = false
+            } else {
+                navigationItem.rightBarButtonItem?.isEnabled = true
+            }
+        }
+    }
     
     @objc func cancelSelecting() {
         selectionMode(enter:false)
@@ -142,43 +187,75 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     
     func fetchPhotosForAlbum() {
         progressView.startAnimating()
-        db.collection("Albums").whereField("Name", isEqualTo: self.albumName).whereField("ownerID", isEqualTo: self.uid!).getDocuments { (snap, e) in
-            if let e = e {
-                print(e.localizedDescription)
-                return
-            }
-            
-            if let snap = snap {
-                if let url = snap.documents.first {
-                    self.imageURL = url.data()["imageURL"] as? [String] ?? []
+        if let albumID = albumID {
+            db.collection("Albums").document(albumID).getDocument { (snap, error) in
+                if let error = error {
+                    print(error.localizedDescription)
+                    self.progressView.stopAnimating()
+                    return
                 }
-            }
-            
-            if self.imageURL.count > 0 {
-                DispatchQueue.global(qos: .background).async {
-                    for url in self.imageURL {
-                        URLSession.shared.dataTask(with: URL(string:url)!, completionHandler: { (data, response, dataTaskError) in
-                            if let dataTaskError = dataTaskError {
-                                print(dataTaskError.localizedDescription)
-                                return
-                            }
-                            DispatchQueue.main.async {
-                                self.progressView.stopAnimating()
-                                
-                                if let data = data {
-                                    if let image = UIImage(data: data) {
-                                        self.photos.append(image)
-                                        self.reloadData = true
-                                    }
-                                }
-                            }
-                        }).resume()
+                if let snap = snap {
+                    if let data = snap.data() {
+                        self.imageURL = data["imageURL"] as! [String]
+                        let ownerID = data["ownerID"] as! String
+                        if ownerID == self.uid {
+                            print("opened by owner")
+                        } else {
+                            print("opened by \(String(describing: self.uid)), Read-only")
+                            self.navigationItem.rightBarButtonItem?.isEnabled = false
+                            self.longPressGesture.isEnabled = false
+                        }
                     }
                 }
-            } else {
-                self.progressView.stopAnimating()
-                print("no data")
+                
+                self.getImageFromURL()
             }
+        } else {
+            db.collection("Albums").whereField("Name", isEqualTo: self.albumName).whereField("ownerID", isEqualTo: self.uid!).getDocuments { (snap, e) in
+                if let e = e {
+                    print(e.localizedDescription)
+                    self.progressView.stopAnimating()
+                    return
+                }
+                
+                if let snap = snap {
+                    if let url = snap.documents.first {
+                        print("here", url.documentID)
+                        self.imageURL = url.data()["imageURL"] as! [String]
+                    }
+                }
+                
+                self.getImageFromURL()
+            }
+        }
+        
+    }
+    
+    func getImageFromURL() {
+        if self.imageURL.count > 0 {
+            DispatchQueue.global(qos: .background).async {
+                for url in self.imageURL {
+                    URLSession.shared.dataTask(with: URL(string:url)!, completionHandler: { (data, response, dataTaskError) in
+                        if let dataTaskError = dataTaskError {
+                            print(dataTaskError.localizedDescription)
+                            return
+                        }
+                        DispatchQueue.main.async {
+                            self.progressView.stopAnimating()
+                            
+                            if let data = data {
+                                if let image = UIImage(data: data) {
+                                    self.photos.append(image)
+                                    self.reloadData = true
+                                }
+                            }
+                        }
+                    }).resume()
+                }
+            }
+        } else {
+            self.progressView.stopAnimating()
+            print("no data")
         }
     }
 

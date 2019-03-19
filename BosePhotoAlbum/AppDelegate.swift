@@ -47,20 +47,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      open url: URL,
                      options: [UIApplication.OpenURLOptionsKey : Any] = [:] ) -> Bool {
-        
-        print(url)
         var isAlbum = false
-        // sample abpa://userID@BosePhotoAlbum/?album=1&mediaID=123
+        var mediaID = ""
+        var userID = ""
+        var albumName = ""
+        var token = ""
+        
+        // sample abpa://userID@BosePhotoAlbum/?album=1&mediaID=123&albumName=myalbum&token=456
         if let host = url.host {
             if host == "BosePhotoAlbum" {
-                if let userID = url.user {
+                if let usrID = url.user {
+                    userID = usrID
                     guard let components = NSURLComponents(url: url, resolvingAgainstBaseURL: true),
-                        let path = components.path,
                         let params = components.queryItems else {
                             print("Invalid URL or album path missing")
                             return false
                     }
-                    
                     if let album = params.first(where: {$0.name == "album"})?.value {
                         if album == "1" {
                             isAlbum = true
@@ -68,21 +70,63 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             isAlbum = false
                         }
                         print("isAlbum = \(isAlbum)")
-                        if let mediaID = params.first(where: { $0.name == "mediaID" })?.value {
+                        if let ID = params.first(where: { $0.name == "mediaID" })?.value {
+                            mediaID = ID
                             print("albumID = \(mediaID)")
                         } else {
                             return false
                         }
+                        
+                        if isAlbum {
+                            if let name = params.first(where: { $0.name == "albumName" })?.value {
+                                albumName = name
+                                print("albumName = \(albumName)")
+                            } else {
+                                return false
+                            }
+                        } else {
+                            if let tk = params.first(where: { $0.name == "token" })?.value {
+                                token = tk
+                                print("token = \(token)")
+                            } else {
+                                return false
+                            }
+                        }
+                        
+                        // successfully parsed
+                        let layout = UICollectionViewFlowLayout()
+                        let homeVC = HomeViewController(collectionViewLayout: layout)
+                        let navigationController = UINavigationController(rootViewController: homeVC)
+                        if isAlbum {
+                            // go to photos view controller
+                            let photosVC = PhotosViewController(collectionViewLayout: layout)
+                            photosVC.albumName = albumName
+                            photosVC.albumID = mediaID
+                            window?.rootViewController = navigationController
+                            navigationController.pushViewController(photosVC, animated: true)
+                        } else {
+                            // go to image view controller
+                            let imageVC = ImageViewController()
+                            imageVC.imageID = mediaID
+                            imageVC.token = token
+                            imageVC.userID = userID
+                            window?.rootViewController = navigationController
+                            navigationController.pushViewController(imageVC, animated: true)
+                        }
+                        self.window?.makeKeyAndVisible()
                         return true
                     } else {
                         return false
                     }
-                    
+                } else {
+                    return false
                 }
+            } else {
+                return false
             }
+        } else {
+            return false
         }
-        return false
     }
-
 }
 

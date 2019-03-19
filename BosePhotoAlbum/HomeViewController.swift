@@ -16,26 +16,39 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     let songsList = ["song1", "song2", "song3"]
     var songs:[URL] = []
     var albums:[String] = []
-    
+    var albumIDs:[String] = []
     let uid = Auth.auth().currentUser?.uid
     var user:User?
     var album:Album?
+    
+    let db = Firestore.firestore()
     
     let reuseID = "albumsCell"
     
     var selectionMode = false
     
-    var selectedAlbumsIndexPath:[IndexPath] = []
+    var selectedAlbumsIndexPath:[IndexPath] = [] {
+        didSet {
+            if (selectedAlbumsIndexPath.count > 1 || selectedAlbumsIndexPath.count == 0)  {
+                navigationItem.rightBarButtonItem?.isEnabled = false
+            } else {
+                navigationItem.rightBarButtonItem?.isEnabled = true
+            }
+        }
+    }
     
     let window = UIApplication.shared.keyWindow
     
     let musicPlayerView = MusicPlayerView()
+    
+    var musicPlayerHidden = false
     
     let musicPlayerHeight:CGFloat = 84
     var musicPlaying = false
     
     var musicPlayerBottomAnchorConstraintToWindow:NSLayoutConstraint?
     var musicPlayerBottomAnchorConstraintToToolbar:NSLayoutConstraint?
+    var musicPlayerTopAnchorConstraintToWindow:NSLayoutConstraint?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,6 +75,30 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         
         setupMusicPlayerView()
         setupAudioPlayer()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(showHidePlayer), name: .showHidePlayer, object: nil)
+    }
+    
+    @objc func showHidePlayer() {
+        if musicPlayerHidden {
+            if selectionMode {
+                musicPlayerTopAnchorConstraintToWindow?.isActive = false
+                musicPlayerBottomAnchorConstraintToWindow?.isActive = false
+                musicPlayerBottomAnchorConstraintToToolbar?.isActive = true
+            } else {
+                musicPlayerBottomAnchorConstraintToToolbar?.isActive = false
+                musicPlayerTopAnchorConstraintToWindow?.isActive = false
+                musicPlayerBottomAnchorConstraintToWindow?.isActive = true
+            }
+        } else {
+            musicPlayerBottomAnchorConstraintToWindow?.isActive = false
+            musicPlayerBottomAnchorConstraintToToolbar?.isActive = false
+            musicPlayerTopAnchorConstraintToWindow?.isActive = true
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.window?.layoutIfNeeded()
+        }
+        musicPlayerHidden.toggle()
     }
     
     func setupNavBar() {
@@ -93,6 +130,8 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
             musicPlayerBottomAnchorConstraintToWindow = musicPlayerView.bottomAnchor.constraint(equalTo: window.layoutMarginsGuide.bottomAnchor, constant: 0)
             
             musicPlayerBottomAnchorConstraintToToolbar = musicPlayerView.bottomAnchor.constraint(equalTo: window.bottomAnchor, constant: -musicPlayerHeight)
+            
+            musicPlayerTopAnchorConstraintToWindow = musicPlayerView.topAnchor.constraint(equalTo: window.bottomAnchor)
             
             window.addSubview(musicPlayerView)
             musicPlayerView.leftAnchor.constraint(equalTo: window.layoutMarginsGuide.leftAnchor).isActive = true
@@ -154,10 +193,9 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     
     func fetchAlbumsForCurrentUser() {
         progressView.startAnimating()
-        let db = Firestore.firestore()
-        let settings = db.settings
-        settings.areTimestampsInSnapshotsEnabled = true
-        db.settings = settings
+//        let settings = db.settings
+//        settings.areTimestampsInSnapshotsEnabled = true
+//        db.settings = settings
         db.collection("Albums").whereField("ownerID", isEqualTo: uid!).getDocuments { (snap, err) in
             if let err = err {
                 print(err.localizedDescription)
@@ -166,6 +204,7 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
             
             if let snap = snap {
                 for doc in snap.documents {
+                    self.albumIDs.append(doc.documentID)
                     self.albums.append(doc.data()["Name"] as! String)
                 }
             }
@@ -180,7 +219,11 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         alert.addTextField { (textField) in
             textField.text = "Untitled"
         }
-
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: { (action) in
+            self.dismiss(animated: true, completion: nil)
+        }))
+        
         alert.addAction(UIAlertAction(title: "Create", style: .default, handler: { [weak alert] (_) in
             let textField = alert!.textFields![0]
             if let txt = textField.text {
@@ -215,12 +258,17 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         print("logged out")
         do {
             try Auth.auth().signOut()
+            if let nav = navigationController {
+                nav.setNavigationBarHidden(true, animated: true)
+                nav.viewControllers = []
+                musicPlayerView.removeFromSuperview()
+                let signInVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "signInVC")
+                nav.setViewControllers([signInVC], animated: true)
+            }
         } catch let logoutError {
             print(logoutError)
             return
         }
-        navigationController?.setNavigationBarHidden(true, animated: true)
-        navigationController?.popToRootViewController(animated: true)
     }
     
     @objc func selectCell(sender: UILongPressGestureRecognizer) {
@@ -248,7 +296,7 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         }
         var rightBarButton:UIBarButtonItem?
         if enter {
-            rightBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelSelecting))
+            rightBarButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(handleSharing))
         } else {
             if let indexPaths = collectionView?.indexPathsForVisibleItems {
                 for indexPath in indexPaths {
@@ -258,14 +306,48 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
                 }
             }
             navigationItem.title = "Albums"
-            rightBarButton = nil
+            rightBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addAlbum))
             selectedAlbumsIndexPath.removeAll()
         }
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
+    @objc func handleSharing() {
+        let url = NSURL(fileURLWithPath: "String")
+        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        activityVC.popoverPresentationController?.sourceView = self.view
+        showHidePlayer()
+        
+        activityVC.completionWithItemsHandler = { (activityType, completed:Bool, returnedItems:[Any]?, error: Error?) in
+            self.showHidePlayer()
+        }
+        self.present(activityVC, animated: true, completion: nil)
+    }
+    
     @objc func handleTrash() {
         print("removed from db")
+        let array = Array(selectedAlbumsIndexPath.sorted().reversed())
+        print(array, albums.count)
+        
+        var toRemove:[String] = []
+        
+        for index in array {
+            if self.albums.indices.contains(index.row) {
+                toRemove.append(self.albumIDs[index.item])
+                self.albums.remove(at: index.item)
+            }
+        }
+        print(albumIDs, toRemove)
+        for albumID in toRemove {
+            db.collection("Albums").document(albumID).delete { (error) in
+                if let error = error {
+                    print(error.localizedDescription)
+                    return
+                }
+                print(albumID)
+                self.collectionView.reloadData()
+            }
+        }
         selectionMode(enter: false)
     }
     
@@ -293,16 +375,17 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if !selectionMode {
-            showControllerForAlbum(album: albums[indexPath.item])
+            showControllerForAlbum(album: albums[indexPath.item], albumID: albumIDs[indexPath.item])
         } else {
             self.select(indexPath: indexPath, albums: true, selected: &selectedAlbumsIndexPath)
         }
     }
     
-    func showControllerForAlbum(album:String) {
+    func showControllerForAlbum(album:String, albumID:String) {
         let layout = UICollectionViewFlowLayout()
         let photosVC = PhotosViewController(collectionViewLayout: layout)
         photosVC.albumName = album
+        photosVC.albumID = albumID
         photosVC.musicPlayerView = musicPlayerView
         photosVC.musicPlayerBottomAnchorConstraintToWindow = musicPlayerBottomAnchorConstraintToWindow
         photosVC.musicPlayerBottomAnchorConstraintToToolbar = musicPlayerBottomAnchorConstraintToToolbar
