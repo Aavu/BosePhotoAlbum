@@ -39,10 +39,10 @@ class SignInViewController: UIViewController {
 //                return
 //        }
         
-        let email = "test@gmail.com"
-        let password = "aaaaaa"
-//        let email = "violinsimma@gmail.com"
-//        let password = "Sankar63"
+//        let email = "test@gmail.com"
+//        let password = "aaaaaa"
+        let email = "violinsimma@gmail.com"
+        let password = "Sankar63"
         Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
             if let error = error {
                 print(error)

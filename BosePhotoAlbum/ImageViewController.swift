@@ -18,6 +18,7 @@ class ImageViewController: UIViewController {
         view.contentMode = .scaleAspectFit
         return view
     }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(imageView)

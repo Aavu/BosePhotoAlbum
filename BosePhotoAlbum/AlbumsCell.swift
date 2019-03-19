@@ -12,6 +12,8 @@ class AlbumsCell: UICollectionViewCell {
     let iconView: UIImageView = {
         let imgView = UIImageView(image: #imageLiteral(resourceName: "folder"))
         imgView.translatesAutoresizingMaskIntoConstraints = false
+        imgView.contentMode = .scaleAspectFit
+        imgView.layer.masksToBounds = true
         return imgView
     }()
     
@@ -27,9 +29,10 @@ class AlbumsCell: UICollectionViewCell {
     let deleteBtn: UIButton = {
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.setImage(#imageLiteral(resourceName: "checkMark"), for: UIControl.State.selected)
+        btn.setImage(#imageLiteral(resourceName: "checkMark"), for: UIControl.State.normal)
         btn.heightAnchor.constraint(equalToConstant: 24).isActive = true
         btn.widthAnchor.constraint(equalTo: btn.heightAnchor).isActive = true
+        btn.isHidden = true
         return btn
     }()
     

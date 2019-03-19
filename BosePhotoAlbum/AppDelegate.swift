@@ -8,17 +8,16 @@
 
 import UIKit
 import Firebase
-import FirebaseDatabase
-import FirebaseAuth
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        UINavigationBar.appearance().tintColor = .black
+        UIToolbar.appearance().tintColor = .black
         FirebaseApp.configure()
         return true
     }
@@ -44,7 +43,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
+    
+    func application(_ application: UIApplication,
+                     open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey : Any] = [:] ) -> Bool {
+        
+        print(url)
+        var isAlbum = false
+        // sample abpa://userID@BosePhotoAlbum/?album=1&mediaID=123
+        if let host = url.host {
+            if host == "BosePhotoAlbum" {
+                if let userID = url.user {
+                    guard let components = NSURLComponents(url: url, resolvingAgainstBaseURL: true),
+                        let path = components.path,
+                        let params = components.queryItems else {
+                            print("Invalid URL or album path missing")
+                            return false
+                    }
+                    
+                    if let album = params.first(where: {$0.name == "album"})?.value {
+                        if album == "1" {
+                            isAlbum = true
+                        } else {
+                            isAlbum = false
+                        }
+                        print("isAlbum = \(isAlbum)")
+                        if let mediaID = params.first(where: { $0.name == "mediaID" })?.value {
+                            print("albumID = \(mediaID)")
+                        } else {
+                            return false
+                        }
+                        return true
+                    } else {
+                        return false
+                    }
+                    
+                }
+            }
+        }
+        return false
+    }
 
 }
 
