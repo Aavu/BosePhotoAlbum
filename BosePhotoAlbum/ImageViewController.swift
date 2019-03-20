@@ -49,13 +49,13 @@ class ImageViewController: UIViewController {
         } else {
             imageView.image = image
         }
-        if let userID = userID {
-            if userID == uid {
-                print("owner")
-            } else {
-                print("read only")
-            }
-        }
+//        if let userID = userID {
+//            if userID == uid {
+//                print("owner")
+//            } else {
+//                print("read only")
+//            }
+//        }
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(tapGesture)

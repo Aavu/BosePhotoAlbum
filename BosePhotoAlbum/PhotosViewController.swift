@@ -43,6 +43,8 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     
     var longPressGesture:UILongPressGestureRecognizer!
     
+    private let refreshControl = UIRefreshControl()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -76,6 +78,13 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
         view.addSubview(progressView)
         progressView.center = view.center
         progressView.hidesWhenStopped = true
+        
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        collectionView.refreshControl = refreshControl
+    }
+    
+    @objc func refreshData() {
+        fetchPhotosForAlbum()
     }
     
     @objc func selectCell(sender: UILongPressGestureRecognizer) {
@@ -191,27 +200,23 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     
     func fetchPhotosForAlbum() {
         progressView.startAnimating()
-        if let albumID = albumID {
-            db.collection("Albums").document(albumID).getDocument { (snap, error) in
-                if let error = error {
-                    print(error.localizedDescription)
-                    self.progressView.stopAnimating()
-                    return
-                }
-                if let snap = snap {
-                    if let data = snap.data() {
-                        if let urls = data["imageURL"] {
-                            self.imageURL = urls as! [String]
-                            let ownerID = data["ownerID"] as! String
-                            if ownerID == self.uid {
-                                print("opened by owner")
-                            } else {
-                                print("opened by \(String(describing: self.uid)), Read-only")
-                                self.navigationItem.rightBarButtonItem?.isEnabled = false
-                                self.longPressGesture.isEnabled = false
-                            }
+        db.collection("Albums").document(albumID).getDocument { (snap, error) in
+            if let error = error {
+                print(error.localizedDescription)
+                self.progressView.stopAnimating()
+                return
+            }
+            if let snap = snap {
+                if let data = snap.data() {
+                    if let urls = data["imageURL"] {
+                        self.imageURL = urls as! [String]
+                        let ownerID = data["ownerID"] as! String
+                        if ownerID == self.uid {
+                            print("opened by owner")
                         } else {
-                            self.progressView.stopAnimating()
+                            print("opened by \(String(describing: self.uid)), Read-only")
+                            self.navigationItem.rightBarButtonItem?.isEnabled = false
+                            self.longPressGesture.isEnabled = false
                         }
                     } else {
                         self.progressView.stopAnimating()
@@ -219,27 +224,31 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
                 } else {
                     self.progressView.stopAnimating()
                 }
-                
-                self.getImageFromURL()
+            } else {
+                self.progressView.stopAnimating()
             }
-        } else {
-            db.collection("Albums").whereField("Name", isEqualTo: self.albumName).whereField("ownerID", isEqualTo: self.uid!).getDocuments { (snap, e) in
-                if let e = e {
-                    print(e.localizedDescription)
-                    self.progressView.stopAnimating()
-                    return
-                }
-                
-                if let snap = snap {
-                    if let url = snap.documents.first {
-                        print("here", url.documentID)
-                        self.imageURL = url.data()["imageURL"] as! [String]
-                    }
-                }
-                
-                self.getImageFromURL()
-            }
+            
+            self.getImageFromURL()
         }
+        
+//        else {
+//            db.collection("Albums").whereField("Name", isEqualTo: self.albumName).whereField("ownerID", isEqualTo: self.uid!).getDocuments { (snap, e) in
+//                if let e = e {
+//                    print(e.localizedDescription)
+//                    self.progressView.stopAnimating()
+//                    return
+//                }
+//
+//                if let snap = snap {
+//                    if let url = snap.documents.first {
+//                        print("here", url.documentID)
+//                        self.imageURL = url.data()["imageURL"] as! [String]
+//                    }
+//                }
+//
+//                self.getImageFromURL()
+//            }
+//        }
         
     }
     
@@ -254,7 +263,7 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
                         }
                         DispatchQueue.main.async {
                             self.progressView.stopAnimating()
-                            
+                            self.refreshControl.endRefreshing()
                             if let data = data {
                                 if let image = UIImage(data: data) {
                                     self.photos.append(image)
@@ -267,6 +276,7 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
             }
         } else {
             self.progressView.stopAnimating()
+            self.refreshControl.endRefreshing()
             print("no data")
         }
     }
@@ -350,8 +360,6 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
         let oldWidth = image.size.width;
         let oldHeight = image.size.height;
         
-//        let scaleFactor = (oldWidth > oldHeight) ? width / oldWidth : height / oldHeight;
-        
         let newHeight = oldHeight * scaleFactor
         let newWidth = oldWidth * scaleFactor
         let newSize = CGSize(width: newWidth, height: newHeight)
@@ -376,6 +384,7 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if !selectionMode {
             imageVC.image = photos[indexPath.item]
+            imageVC.imageView.image = photos[indexPath.item]
             navigationController?.pushViewController(imageVC, animated: true)
         } else {
             self.select(indexPath: indexPath, albums: false, selected: &selectedPhotosIndexPath)

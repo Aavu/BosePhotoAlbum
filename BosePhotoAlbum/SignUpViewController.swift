@@ -78,8 +78,13 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBAction func signUp(_ sender: Any) {
         guard let email = emailTextField.text, let password = passwordTextField.text, let firstName = firstNameTextField.text, let lastName = lastNameTextField.text
             else {
-                print("not valid")
                 return
+        }
+        
+        if email == "" || password == "" || firstName == "" || lastName == "" {
+            notificationLabel.isHidden = false
+            notificationLabel.text = "Fields with * are required..."
+            return
         }
         
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
@@ -88,6 +93,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                     switch AuthErrorCode(rawValue: error._code) {
                     case .emailAlreadyInUse?:
                         print("Email already in use")
+                        self.notificationLabel.text = "Oops! This email is already taken"
                         self.notificationLabel.isHidden = false
                         self.signIn_btn.isHidden = false
                     default:

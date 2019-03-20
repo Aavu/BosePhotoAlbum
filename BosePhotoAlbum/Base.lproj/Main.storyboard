@@ -132,15 +132,6 @@
                                     <action selector="signIn:" destination="nw9-P3-IqO" eventType="touchUpInside" id="8BV-Y7-T6n"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- or -" textAlignment="natural" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xIr-Yz-NMS">
-                                <rect key="frame" x="187" y="616" width="40" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="7d8-yO-5zO"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="RCN-kQ-b1K">
                                 <rect key="frame" x="71" y="813" width="272" height="29"/>
                                 <subviews>
@@ -181,16 +172,13 @@
                             <constraint firstItem="qOA-sX-AG1" firstAttribute="top" secondItem="RaA-yr-5j9" secondAttribute="bottom" constant="27" id="LRK-tF-PYZ"/>
                             <constraint firstItem="GoP-5p-eUb" firstAttribute="leading" secondItem="wQb-1U-Rzi" secondAttribute="leading" constant="20" id="M3h-9x-mQn"/>
                             <constraint firstItem="RCN-kQ-b1K" firstAttribute="leading" secondItem="wQb-1U-Rzi" secondAttribute="leading" constant="71" id="ThK-Kh-MBs"/>
-                            <constraint firstItem="xIr-Yz-NMS" firstAttribute="leading" secondItem="wQb-1U-Rzi" secondAttribute="leading" constant="187" id="UwG-9U-nIw"/>
                             <constraint firstItem="RaA-yr-5j9" firstAttribute="leading" secondItem="wQb-1U-Rzi" secondAttribute="leading" constant="20" id="Ztj-jc-BgG"/>
                             <constraint firstItem="wQb-1U-Rzi" firstAttribute="trailing" secondItem="RaA-yr-5j9" secondAttribute="trailing" constant="20" id="gog-iJ-YJx"/>
                             <constraint firstItem="GoP-5p-eUb" firstAttribute="centerX" secondItem="9nu-xG-hn1" secondAttribute="centerX" id="iB0-Ov-qz9"/>
                             <constraint firstItem="GoP-5p-eUb" firstAttribute="top" secondItem="wQb-1U-Rzi" secondAttribute="top" constant="100" id="iN4-oy-mVf"/>
-                            <constraint firstAttribute="bottom" secondItem="xIr-Yz-NMS" secondAttribute="bottom" constant="256" id="m1h-TR-u5q"/>
                             <constraint firstItem="qOA-sX-AG1" firstAttribute="trailing" secondItem="RaA-yr-5j9" secondAttribute="trailing" id="nhn-LT-roi"/>
                             <constraint firstAttribute="bottomMargin" secondItem="RCN-kQ-b1K" secondAttribute="bottom" constant="20" id="qZO-CH-l1t"/>
                             <constraint firstItem="RaA-yr-5j9" firstAttribute="centerX" secondItem="9nu-xG-hn1" secondAttribute="centerX" id="yu4-vf-eUE"/>
-                            <constraint firstItem="qOA-sX-AG1" firstAttribute="centerX" secondItem="xIr-Yz-NMS" secondAttribute="centerX" id="zcE-T1-HPC"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="wQb-1U-Rzi"/>
                     </view>
