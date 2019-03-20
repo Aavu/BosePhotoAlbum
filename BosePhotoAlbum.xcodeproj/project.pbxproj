@@ -108,27 +108,51 @@
 		7A60FC95223E1A0C0095CD1D /* BosePhotoAlbum */ = {
 			isa = PBXGroup;
 			children = (
+				7A8F329E2241EB2300CE1A8B /* Controller */,
+				7A8F329D2241EB1E00CE1A8B /* View */,
+				7A8F329C2241EB1500CE1A8B /* Model */,
 				7AD1B462224113A800A656AA /* songs */,
-				7A60FC98223E1A0C0095CD1D /* HomeViewController.swift */,
-				7A60FCAA223E2B530095CD1D /* SlideShowViewController.swift */,
-				7AD1B442223E5B7E00A656AA /* SignUpViewController.swift */,
-				7AD1B444223E5BB200A656AA /* SignInViewController.swift */,
-				7AD1B448223EE56500A656AA /* PhotosViewController.swift */,
-				7AD1B446223E7F4400A656AA /* AlbumsCell.swift */,
-				7AD1B44A223F362E00A656AA /* PhotosCell.swift */,
 				7A60FC96223E1A0C0095CD1D /* AppDelegate.swift */,
 				7AD1B45A22410C3800A656AA /* Assets.xcassets */,
 				7A60FC9A223E1A0C0095CD1D /* Main.storyboard */,
 				7A60FC9F223E1A0D0095CD1D /* LaunchScreen.storyboard */,
 				7A60FCA2223E1A0D0095CD1D /* Info.plist */,
 				7AD1B440223E56BB00A656AA /* GoogleService-Info.plist */,
-				7AD1B44E223F4E4300A656AA /* Album.swift */,
-				7AD1B450223F4F9800A656AA /* User.swift */,
-				7AD1B452223FC95800A656AA /* ImageViewController.swift */,
-				7AD1B4562240E87A00A656AA /* MusicPlayerView.swift */,
 				7AD1B458224104CF00A656AA /* helper.swift */,
 			);
 			path = BosePhotoAlbum;
+			sourceTree = "<group>";
+		};
+		7A8F329C2241EB1500CE1A8B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				7AD1B44E223F4E4300A656AA /* Album.swift */,
+				7AD1B450223F4F9800A656AA /* User.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		7A8F329D2241EB1E00CE1A8B /* View */ = {
+			isa = PBXGroup;
+			children = (
+				7AD1B446223E7F4400A656AA /* AlbumsCell.swift */,
+				7AD1B44A223F362E00A656AA /* PhotosCell.swift */,
+				7AD1B4562240E87A00A656AA /* MusicPlayerView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		7A8F329E2241EB2300CE1A8B /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				7A60FC98223E1A0C0095CD1D /* HomeViewController.swift */,
+				7A60FCAA223E2B530095CD1D /* SlideShowViewController.swift */,
+				7AD1B442223E5B7E00A656AA /* SignUpViewController.swift */,
+				7AD1B444223E5BB200A656AA /* SignInViewController.swift */,
+				7AD1B448223EE56500A656AA /* PhotosViewController.swift */,
+				7AD1B452223FC95800A656AA /* ImageViewController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 		7AD1B462224113A800A656AA /* songs */ = {
