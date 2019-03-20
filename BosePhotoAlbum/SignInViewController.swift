@@ -16,9 +16,12 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var signIn_btn: UIButton!
     
+    @IBOutlet var notificationLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = true
+        notificationLabel.isHidden = true
         signIn_btn.layer.masksToBounds = true
         signIn_btn.layer.cornerRadius = signIn_btn.frame.height/2
         
@@ -46,6 +49,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == emailTextField {
             passwordTextField.becomeFirstResponder()
+            self.notificationLabel.isHidden = true
         } else {
             passwordTextField.resignFirstResponder()
         }
@@ -68,6 +72,10 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
             if let error = error {
                 print(error)
+                if error._code == 17009 {
+                    self.notificationLabel.isHidden = false
+                    self.progressView.stopAnimating()
+                }
                 return
             }
             self.progressView.stopAnimating()

@@ -162,11 +162,22 @@
                                     <constraint firstItem="sCw-Qc-mrw" firstAttribute="top" secondItem="RCN-kQ-b1K" secondAttribute="top" id="ysl-nt-Z7j"/>
                                 </constraints>
                             </stackView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Username and/or password incorrect. Try again" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" minimumFontSize="7" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-2R-exP">
+                                <rect key="frame" x="20" y="480" width="374" height="48"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="48" id="sBc-yy-33k"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="RCN-kQ-b1K" firstAttribute="centerX" secondItem="9nu-xG-hn1" secondAttribute="centerX" id="A1o-Q9-dm6"/>
                             <constraint firstItem="qOA-sX-AG1" firstAttribute="leading" secondItem="RaA-yr-5j9" secondAttribute="leading" id="Bh3-Mf-YGJ"/>
+                            <constraint firstItem="gA9-2R-exP" firstAttribute="trailing" secondItem="qOA-sX-AG1" secondAttribute="trailing" id="BhS-N8-kaH"/>
+                            <constraint firstItem="gA9-2R-exP" firstAttribute="leading" secondItem="qOA-sX-AG1" secondAttribute="leading" id="D1f-Mu-Lxj"/>
                             <constraint firstItem="YxE-ub-rZ2" firstAttribute="firstBaseline" secondItem="GoP-5p-eUb" secondAttribute="baseline" constant="70.5" id="EE1-QQ-pQ0"/>
                             <constraint firstItem="wQb-1U-Rzi" firstAttribute="trailing" secondItem="GoP-5p-eUb" secondAttribute="trailing" constant="20" id="JwR-Ob-wCp"/>
                             <constraint firstItem="qOA-sX-AG1" firstAttribute="top" secondItem="RaA-yr-5j9" secondAttribute="bottom" constant="27" id="LRK-tF-PYZ"/>
@@ -176,6 +187,7 @@
                             <constraint firstItem="wQb-1U-Rzi" firstAttribute="trailing" secondItem="RaA-yr-5j9" secondAttribute="trailing" constant="20" id="gog-iJ-YJx"/>
                             <constraint firstItem="GoP-5p-eUb" firstAttribute="centerX" secondItem="9nu-xG-hn1" secondAttribute="centerX" id="iB0-Ov-qz9"/>
                             <constraint firstItem="GoP-5p-eUb" firstAttribute="top" secondItem="wQb-1U-Rzi" secondAttribute="top" constant="100" id="iN4-oy-mVf"/>
+                            <constraint firstItem="gA9-2R-exP" firstAttribute="top" secondItem="qOA-sX-AG1" secondAttribute="bottom" constant="8" symbolic="YES" id="kQk-Q1-VsG"/>
                             <constraint firstItem="qOA-sX-AG1" firstAttribute="trailing" secondItem="RaA-yr-5j9" secondAttribute="trailing" id="nhn-LT-roi"/>
                             <constraint firstAttribute="bottomMargin" secondItem="RCN-kQ-b1K" secondAttribute="bottom" constant="20" id="qZO-CH-l1t"/>
                             <constraint firstItem="RaA-yr-5j9" firstAttribute="centerX" secondItem="9nu-xG-hn1" secondAttribute="centerX" id="yu4-vf-eUE"/>
@@ -184,6 +196,7 @@
                     </view>
                     <connections>
                         <outlet property="emailTextField" destination="YxE-ub-rZ2" id="ZP7-h5-ina"/>
+                        <outlet property="notificationLabel" destination="gA9-2R-exP" id="vgi-Qf-noN"/>
                         <outlet property="passwordTextField" destination="qHW-Xh-kud" id="vHs-eG-ocX"/>
                         <outlet property="signIn_btn" destination="qOA-sX-AG1" id="2Jt-e2-YJm"/>
                     </connections>
