@@ -231,6 +231,11 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
                 if let user = self.user {
                     let album = Album(name: txtVal, owner: user)
                     album.addToFirestore()
+                    self.db.collection("Albums").whereField("ownerID", isEqualTo: user.id).whereField("Name", isEqualTo: txtVal).getDocuments { (snap, error) in
+                        if let id = snap?.documents.first?.documentID {
+                            self.albumIDs.append(id)
+                        }
+                    }
                 }
                 self.collectionView.reloadData()
             }
@@ -313,8 +318,13 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     }
     
     @objc func handleSharing() {
-        let url = NSURL(fileURLWithPath: "String")
-        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        let albumID = albumIDs[selectedAlbumsIndexPath[0].item]
+        let albumName = albums[selectedAlbumsIndexPath[0].item]
+        print(albums)
+        let url = "abpa://\(uid!)@BosePhotoAlbum/?album=1&mediaID=\(albumID)&albumName=\(albumName)&token=0".addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: " \n\r").inverted)
+        
+        let activityVC = UIActivityViewController(activityItems: [url!], applicationActivities: nil)
+        activityVC.setValue("Link to \(albumName) - Bose Photo Album", forKey: "subject")
         activityVC.popoverPresentationController?.sourceView = self.view
         showHidePlayer()
         
@@ -325,9 +335,7 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     }
     
     @objc func handleTrash() {
-        print("removed from db")
         let array = Array(selectedAlbumsIndexPath.sorted().reversed())
-        print(array, albums.count)
         
         var toRemove:[String] = []
         
@@ -337,14 +345,12 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
                 self.albums.remove(at: index.item)
             }
         }
-        print(albumIDs, toRemove)
         for albumID in toRemove {
             db.collection("Albums").document(albumID).delete { (error) in
                 if let error = error {
                     print(error.localizedDescription)
                     return
                 }
-                print(albumID)
                 self.collectionView.reloadData()
             }
         }

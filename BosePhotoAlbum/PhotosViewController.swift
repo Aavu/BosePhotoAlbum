@@ -124,11 +124,15 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     }
     
     @objc func handleSharing() {
-        let url = NSURL(fileURLWithPath: "String")
+        let imgURL = imageURL[selectedPhotosIndexPath[0].item]
+        var set = imgURL.components(separatedBy: "com/o/")
+        set.remove(at: 0)
+        set = set[0].components(separatedBy: ".jpg?alt=media&token=")
+        let url = "abpa://\(uid!)@BosePhotoAlbum/?album=0&mediaID=\(set[0])&albumName=nil&token=\(set[1])"
         let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
         activityVC.popoverPresentationController?.sourceView = self.view
         showHidePlayer()
-        
+
         activityVC.completionWithItemsHandler = { (activityType, completed:Bool, returnedItems:[Any]?, error: Error?) in
             self.selectionMode(enter: false)
             self.showHidePlayer()
@@ -196,16 +200,24 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
                 }
                 if let snap = snap {
                     if let data = snap.data() {
-                        self.imageURL = data["imageURL"] as! [String]
-                        let ownerID = data["ownerID"] as! String
-                        if ownerID == self.uid {
-                            print("opened by owner")
+                        if let urls = data["imageURL"] {
+                            self.imageURL = urls as! [String]
+                            let ownerID = data["ownerID"] as! String
+                            if ownerID == self.uid {
+                                print("opened by owner")
+                            } else {
+                                print("opened by \(String(describing: self.uid)), Read-only")
+                                self.navigationItem.rightBarButtonItem?.isEnabled = false
+                                self.longPressGesture.isEnabled = false
+                            }
                         } else {
-                            print("opened by \(String(describing: self.uid)), Read-only")
-                            self.navigationItem.rightBarButtonItem?.isEnabled = false
-                            self.longPressGesture.isEnabled = false
+                            self.progressView.stopAnimating()
                         }
+                    } else {
+                        self.progressView.stopAnimating()
                     }
+                } else {
+                    self.progressView.stopAnimating()
                 }
                 
                 self.getImageFromURL()

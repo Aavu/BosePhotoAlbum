@@ -25,7 +25,7 @@ class SignInViewController: UIViewController {
         emailTextField.leftViewMode = .always
         
         passwordTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: passwordTextField.frame.height))
-        emailTextField.leftViewMode = .always
+        passwordTextField.leftViewMode = .always
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -33,14 +33,14 @@ class SignInViewController: UIViewController {
     }
     
     @IBAction func signIn(_ sender: Any) {
-//        guard let email = emailTextField.text, let password = passwordTextField.text
-//            else {
-//                print("not valid")
-//                return
-//        }
+        guard let email = emailTextField.text, let password = passwordTextField.text
+            else {
+                print("not valid")
+                return
+        }
         
-        let email = "test@gmail.com"
-        let password = "aaaaaa"
+//        let email = "test@gmail.com"
+//        let password = "aaaaaa"
 //        let email = "violinsimma@gmail.com"
 //        let password = "Sankar63"
         Auth.auth().signIn(withEmail: email, password: password) { (result, error) in

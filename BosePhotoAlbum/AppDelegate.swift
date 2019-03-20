@@ -79,7 +79,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         
                         if isAlbum {
                             if let name = params.first(where: { $0.name == "albumName" })?.value {
-                                albumName = name
+                                albumName = name.removingPercentEncoding ?? "nil"
                                 print("albumName = \(albumName)")
                             } else {
                                 return false

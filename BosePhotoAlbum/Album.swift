@@ -21,7 +21,6 @@ class Album: NSObject {
     }
     
     func getURL() -> URL? {
-        
         return self.url
     }
     
@@ -34,20 +33,6 @@ class Album: NSObject {
     
     func addPhoto(img:UIImage) {
         self.photos.append(img)
-    }
-    
-    func addToFirebase() {
-        let dbRef = Database.database().reference().child("Albums").childByAutoId()
-        let ownerDetails = ["firstName":self.owner.firstName,
-                            "lastName": self.owner.lastName,
-                            "email":self.owner.email,
-                            "uid": self.owner.id]
-        dbRef.child(self.name).updateChildValues(ownerDetails as! [String : String], withCompletionBlock: { (error, ref) in
-            if let error = error {
-                print(error.localizedDescription)
-                return
-            }
-        })
     }
     
     func addToFirestore() {
