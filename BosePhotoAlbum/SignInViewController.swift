@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-class SignInViewController: UIViewController {
+class SignInViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
@@ -18,27 +18,49 @@ class SignInViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = true
         signIn_btn.layer.masksToBounds = true
         signIn_btn.layer.cornerRadius = signIn_btn.frame.height/2
+        
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
         
         emailTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: emailTextField.frame.height))
         emailTextField.leftViewMode = .always
         
         passwordTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: passwordTextField.frame.height))
         passwordTextField.leftViewMode = .always
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
+        
+        view.addSubview(progressView)
+        progressView.center = view.center
+        progressView.hidesWhenStopped = true
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        navigationController?.isNavigationBarHidden = true
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == emailTextField {
+            passwordTextField.becomeFirstResponder()
+        } else {
+            passwordTextField.resignFirstResponder()
+        }
+        return true
+    }
+    
+    let progressView = UIActivityIndicatorView(style: .gray)
     
     @IBAction func signIn(_ sender: Any) {
+        progressView.startAnimating()
         guard let email = emailTextField.text, let password = passwordTextField.text
             else {
                 print("not valid")
                 return
         }
-        
 //        let email = "test@gmail.com"
 //        let password = "aaaaaa"
 //        let email = "violinsimma@gmail.com"
@@ -48,7 +70,7 @@ class SignInViewController: UIViewController {
                 print(error)
                 return
             }
-            
+            self.progressView.stopAnimating()
             let layout = UICollectionViewFlowLayout()
             let homeVC = HomeViewController(collectionViewLayout: layout)
             self.navigationController?.pushViewController(homeVC, animated: true)

@@ -77,7 +77,9 @@ class ImageViewController: UIViewController {
                 URLSession.shared.dataTask(with: _url, completionHandler: { (data, response, dataTaskError) in
                     if let dataTaskError = dataTaskError {
                         print(dataTaskError.localizedDescription)
-                        self.progressView.stopAnimating()
+                        DispatchQueue.main.async {
+                            self.progressView.stopAnimating()
+                        }
                         return
                     }
                     DispatchQueue.main.async {

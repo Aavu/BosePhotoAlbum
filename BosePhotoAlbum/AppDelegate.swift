@@ -99,6 +99,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         let navigationController = UINavigationController(rootViewController: homeVC)
                         if isAlbum {
                             // go to photos view controller
+                            let layout = UICollectionViewFlowLayout()
                             let photosVC = PhotosViewController(collectionViewLayout: layout)
                             photosVC.albumName = albumName
                             photosVC.albumID = mediaID

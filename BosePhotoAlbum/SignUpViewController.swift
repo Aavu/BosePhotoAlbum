@@ -10,21 +10,26 @@ import UIKit
 import FirebaseDatabase
 import FirebaseAuth
 
-class SignUpViewController: UIViewController {
+class SignUpViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var firstNameTextField: UITextField!
     @IBOutlet weak var lastNameTextField: UITextField!
     
+    @IBOutlet weak var notificationLabel: UILabel!
     @IBOutlet weak var signUp_btn: UIButton!
-    
-    let homeVC = HomeViewController()
+    @IBOutlet var signIn_btn: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         signUp_btn.layer.masksToBounds = true
         signUp_btn.layer.cornerRadius = signUp_btn.frame.height/2
+        
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        firstNameTextField.delegate = self
+        lastNameTextField.delegate = self
         
         emailTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: emailTextField.frame.height))
         emailTextField.leftViewMode = .always
@@ -37,10 +42,37 @@ class SignUpViewController: UIViewController {
         
         lastNameTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: lastNameTextField.frame.height))
         lastNameTextField.leftViewMode = .always
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
+        notificationLabel.isHidden = true
+        signIn_btn.isHidden = true
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.isNavigationBarHidden = true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        switch textField {
+        case emailTextField:
+            passwordTextField.becomeFirstResponder()
+            notificationLabel.isHidden = true
+            signIn_btn.isHidden = true
+        case passwordTextField:
+            firstNameTextField.becomeFirstResponder()
+        case firstNameTextField:
+            lastNameTextField.becomeFirstResponder()
+        case lastNameTextField:
+            textField.resignFirstResponder()
+        default:
+            textField.resignFirstResponder()
+        }
+        return true
     }
     
     @IBAction func signUp(_ sender: Any) {
@@ -56,6 +88,8 @@ class SignUpViewController: UIViewController {
                     switch AuthErrorCode(rawValue: error._code) {
                     case .emailAlreadyInUse?:
                         print("Email already in use")
+                        self.notificationLabel.isHidden = false
+                        self.signIn_btn.isHidden = false
                     default:
                         print("Other error")
                     }
@@ -74,7 +108,9 @@ class SignUpViewController: UIViewController {
                     return
                 }
                 print("successfully created user")
-                self.navigationController?.pushViewController(self.homeVC, animated: true)
+                let layout = UICollectionViewFlowLayout()
+                let homeVC = HomeViewController(collectionViewLayout: layout)
+                self.navigationController?.pushViewController(homeVC, animated: true)
             })
         }
     }

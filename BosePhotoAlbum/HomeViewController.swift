@@ -50,22 +50,14 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     var musicPlayerBottomAnchorConstraintToToolbar:NSLayoutConstraint?
     var musicPlayerTopAnchorConstraintToWindow:NSLayoutConstraint?
     
+    private let refreshControl = UIRefreshControl()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavBar()
         collectionView.register(AlbumsCell.self, forCellWithReuseIdentifier: reuseID)
         
-        if let uid = uid {
-            let currentUserDetails = Database.database().reference().child("users").child(uid)
-            currentUserDetails.observeSingleEvent(of: .value) { (snap) in
-                if let d = snap.value as? [String: AnyObject] {
-                    self.user = User(firstName: d["firstName"] as? String, lastName: d["lastName"] as? String, email: d["email"] as? String, id: uid)
-                    self.fetchAlbumsForCurrentUser()
-                }
-            }
-        } else {
-            handleLogout()
-        }
+        refreshData()
         
         initEditMode()
         collectionView.backgroundColor = .white
@@ -77,6 +69,23 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         setupAudioPlayer()
         
         NotificationCenter.default.addObserver(self, selector: #selector(showHidePlayer), name: .showHidePlayer, object: nil)
+        
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        collectionView.refreshControl = refreshControl
+    }
+    
+    @objc func refreshData() {
+        if let uid = uid {
+            let currentUserDetails = Database.database().reference().child("users").child(uid)
+            currentUserDetails.observeSingleEvent(of: .value) { (snap) in
+                if let d = snap.value as? [String: AnyObject] {
+                    self.user = User(firstName: d["firstName"] as? String, lastName: d["lastName"] as? String, email: d["email"] as? String, id: uid)
+                    self.fetchAlbumsForCurrentUser()
+                }
+            }
+        } else {
+            handleLogout()
+        }
     }
     
     @objc func showHidePlayer() {
@@ -191,25 +200,37 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     
     let progressView = UIActivityIndicatorView(style: .gray)
     
+    var reloadData = false {
+        didSet {
+            if reloadData {
+                self.collectionView.reloadData()
+            }
+        }
+    }
+    
     func fetchAlbumsForCurrentUser() {
         progressView.startAnimating()
 //        let settings = db.settings
 //        settings.areTimestampsInSnapshotsEnabled = true
 //        db.settings = settings
+        self.albumIDs = []
+        self.albums = []
         db.collection("Albums").whereField("ownerID", isEqualTo: uid!).getDocuments { (snap, err) in
             if let err = err {
                 print(err.localizedDescription)
                 return
             }
-            
+
             if let snap = snap {
                 for doc in snap.documents {
                     self.albumIDs.append(doc.documentID)
                     self.albums.append(doc.data()["Name"] as! String)
+                    self.reloadData = true
                 }
+                print(self.albums, self.albumIDs)
             }
-            self.collectionView.reloadData()
         }
+        self.refreshControl.endRefreshing()
         self.progressView.stopAnimating()
     }
     
@@ -260,7 +281,6 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     }
     
     @objc func handleLogout() {
-        print("logged out")
         do {
             try Auth.auth().signOut()
             if let nav = navigationController {
@@ -320,7 +340,6 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     @objc func handleSharing() {
         let albumID = albumIDs[selectedAlbumsIndexPath[0].item]
         let albumName = albums[selectedAlbumsIndexPath[0].item]
-        print(albums)
         let url = "abpa://\(uid!)@BosePhotoAlbum/?album=1&mediaID=\(albumID)&albumName=\(albumName)&token=0".addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: " \n\r").inverted)
         
         let activityVC = UIActivityViewController(activityItems: [url!], applicationActivities: nil)
